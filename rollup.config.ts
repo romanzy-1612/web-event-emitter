@@ -11,7 +11,7 @@ const rollupConfig: RollupOptions = {
     {
       file: 'dist/index.js',
       format: 'umd',
-      name: 'web-event-emitter',
+      name: 'WebEventEmitter',
       sourcemap: true,
       interop: false,
     },
