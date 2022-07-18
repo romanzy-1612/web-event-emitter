@@ -69,4 +69,4 @@ export class MyClass extends WebEventEmitter<MyEventMap> {}
 
 # Credits
 
-Event emitter from (peer-light)[https://github.com/romanzy-1612/peer-lite] was used as base for this package
+Event emitter from [peer-light](https://github.com/skyllo/peer-lite) was used as base for this package
