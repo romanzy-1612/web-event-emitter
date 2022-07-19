@@ -50,7 +50,6 @@ export class WebEventEmitter<Events extends BaseEventMap> {
    * Subscribes to event once
    * @param event Event name
    * @param listener Callback function to execute when event is emitted
-   * @returns
    */
   public once<E extends keyof Events>(event: E, listener: Events[E]): this {
     // FIX this will not be cleaned up if offAll is used
@@ -68,21 +67,19 @@ export class WebEventEmitter<Events extends BaseEventMap> {
   }
 
   /**
-   * Waits for event to complete once
+   * Waits for event to complete, currently never rejects
    * @param event Event name
-   * @param listener Callback function to execute when event is emitted
-   * @returns
+   * @returns In async context returns event data as an array
    */
-  public async wait<E extends keyof Events>(event: E): Promise<Events[E]> {
+  public async wait<E extends keyof Events>(event: E): Promise<Arguments<Events[E]>> {
     // FIX this will not be cleaned up if offAll is used
-    // For now the event in hanging forever
+    // For now the event will be hanging forever!
+    // See skipped test
 
     return new Promise((resolve, _reject) => {
       const sub = (...args) => {
         this.off(event, sub as any);
 
-        // eslint-disable-next-line prefer-rest-params
-        // listener.apply(this, args);
         resolve(args as any);
       };
 
@@ -98,11 +95,6 @@ export class WebEventEmitter<Events extends BaseEventMap> {
   public off<E extends keyof Events>(event: E, listener: Events[E]): this {
     const listeners = this.eventMap[event];
     if (!listeners) return this;
-
-    if (!listener) {
-      delete this.eventMap[event];
-      return this;
-    }
 
     for (let i = listeners.length - 1; i >= 0; i -= 1) {
       if (listeners[i] === listener) {

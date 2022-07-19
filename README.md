@@ -52,6 +52,13 @@ export class MyClass extends WebEventEmitter<MyEventMap> {}
   public once<E extends keyof Events>(event: E, listener: Events[E]): this
 
   /**
+   * Waits for event to complete, currently never rejects
+   * @param event Event name
+   * @returns In async context returns event data as an array
+   */
+  public async wait<E extends keyof Events>(event: E): Promise<Arguments<Events[E]>>
+
+  /**
    * Unsubscribes from event
    * @param event Event name
    * @param listener Callback function used when subscribed

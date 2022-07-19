@@ -2,7 +2,12 @@ import { describe, expect, test, jest } from '@jest/globals';
 
 import { WebEventEmitter } from './index';
 
-let emitter: WebEventEmitter<any>;
+export type MyEventMap = {
+  eventName: () => void;
+  eventWithData: (arg1: string, arg2: string) => void;
+};
+
+let emitter: WebEventEmitter<MyEventMap>;
 beforeEach(() => {
   emitter = new WebEventEmitter();
 });
@@ -76,6 +81,24 @@ describe('Emitter events', () => {
   });
 });
 
+//branch testing
+describe('Emitter methods returns correctly', () => {
+  test('when emitting events', () => {
+    expect(emitter.emit('eventName')).toEqual(false);
+    emitter.on('eventName', () => {});
+    expect(emitter.emit('eventName')).toEqual(true);
+  });
+  test('when subscribing', () => {
+    expect(emitter.on('eventName', () => {})).toBe(emitter);
+    expect(emitter.on('eventName', () => {})).toBe(emitter);
+  });
+  test('when unsubscribing', () => {
+    expect(emitter.off('eventName', () => {})).toBe(emitter);
+    expect(emitter.offAll('eventName')).toBe(emitter);
+    expect(emitter.offAll()).toBe(emitter);
+  });
+});
+
 describe('Emitter callback data', () => {
   const spyFunc = jest.fn();
 
@@ -89,32 +112,57 @@ describe('Emitter callback data', () => {
   });
 
   test('is correct in on', () => {
-    emitter.on('eventName', cb);
-    emitter.emit('eventName', 'arg1', 'arg2');
-    expect(spyFunc).toBeCalledWith(['arg1', 'arg2']);
-
-    // spyFunc.mockClear();
+    expect.assertions(2);
+    emitter.on('eventWithData', cb);
+    emitter.on('eventWithData', (arg1, arg2) => {
+      expect(arg1).toEqual('arg1');
+      expect(arg2).toEqual('arg2');
+    });
+    emitter.emit('eventWithData', 'arg1', 'arg2');
+    // expect(spyFunc).toBeCalledWith(['arg1', 'arg2']);
   });
 
   test('is correct in once', () => {
-    emitter.once('eventName', cb);
-    emitter.emit('eventName', 'arg1', 'arg2');
-    emitter.emit('eventName', 'arg1', 'arg2');
+    emitter.once('eventWithData', cb);
+    emitter.emit('eventWithData', 'arg1', 'arg2');
+    emitter.emit('eventWithData', 'arg1', 'arg2');
     expect(spyFunc).toBeCalledTimes(1); //not needed but why not
     expect(spyFunc).toBeCalledWith(['arg1', 'arg2']);
 
     // spyFunc.mockClear();
   });
 
-  test('is correct in wait', async () => {
+  test('is correct in wait promise', () => {
     expect.assertions(2);
 
-    emitter.wait('eventName').then((val) => {
-      // console.log('return val', val);
+    emitter.wait('eventWithData').then((val) => {
       expect(val).toEqual(['arg1', 'arg2']);
     });
 
-    const res = emitter.emit('eventName', 'arg1', 'arg2');
+    const res = emitter.emit('eventWithData', 'arg1', 'arg2');
+    expect(res).toBe(true);
+  });
+
+  test('is correct in async wait', async () => {
+    expect.assertions(1);
+
+    setTimeout(() => {
+      emitter.emit('eventWithData', 'arg1', 'arg2');
+    });
+
+    const res = await emitter.wait('eventWithData');
+    expect(res).toEqual(['arg1', 'arg2']);
+  });
+
+  // TODO
+  test.skip('is rejected in wait when event is removed', () => {
+    expect.assertions(2);
+
+    emitter.wait('eventName').catch((val) => {
+      expect(val).toEqual('event emitter destroyed');
+    });
+
+    const res = emitter.offAll('eventName');
     expect(res).toBe(true);
   });
 });
