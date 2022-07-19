@@ -54,17 +54,33 @@ export class WebEventEmitter<Events extends BaseEventMap> {
    */
   public once<E extends keyof Events>(event: E, listener: Events[E]): this {
     // FIX this will not be cleaned up if offAll is used
-    const sub = () => {
+    const sub = (...args) => {
       this.off(event, sub as any);
 
       // eslint-disable-next-line prefer-rest-params
-      listener.apply(this, arguments as any);
+      // listener.apply(this, args);
+      listener(...args);
     };
 
     this.on(event, sub as any);
 
     return this;
   }
+
+  /**
+   * Waits for event to complete once
+   * @param event Event name
+   * @param listener Callback function to execute when event is emitted
+   * @returns
+   */
+  // public async wait<E extends keyof Events>(event: E): Promise<Events[E]> {
+  //   // FIX this will not be cleaned up if offAll is used
+
+  //   return new Promise((resolve, _reject) => {
+  //     this.once(event, (result) => resolve(result as any));
+  //     // resolve();
+  //   });
+  // }
 
   /**
    * Unsubscribes from event
