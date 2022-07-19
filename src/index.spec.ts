@@ -74,7 +74,7 @@ describe('Emitter events', () => {
   test('emitter can wait', () => {
     expect.assertions(1);
 
-    emitter.wait('eventName').then((res) => {
+    emitter.waitFor('eventName').then((res) => {
       expect(res).toEqual([]);
     });
     emitter.emit('eventName');
@@ -135,7 +135,7 @@ describe('Emitter callback data', () => {
   test('is correct in wait promise', () => {
     expect.assertions(2);
 
-    emitter.wait('eventWithData').then((val) => {
+    emitter.waitFor('eventWithData').then((val) => {
       expect(val).toEqual(['arg1', 'arg2']);
     });
 
@@ -150,7 +150,7 @@ describe('Emitter callback data', () => {
       emitter.emit('eventWithData', 'arg1', 'arg2');
     });
 
-    const res = await emitter.wait('eventWithData');
+    const res = await emitter.waitFor('eventWithData');
     expect(res).toEqual(['arg1', 'arg2']);
   });
 
@@ -158,7 +158,7 @@ describe('Emitter callback data', () => {
   test.skip('is rejected in wait when event is removed', () => {
     expect.assertions(2);
 
-    emitter.wait('eventName').catch((val) => {
+    emitter.waitFor('eventName').catch((val) => {
       expect(val).toEqual('event emitter destroyed');
     });
 

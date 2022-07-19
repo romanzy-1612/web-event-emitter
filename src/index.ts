@@ -71,7 +71,7 @@ export class WebEventEmitter<Events extends BaseEventMap> {
    * @param event Event name
    * @returns In async context returns event data as an array
    */
-  public async wait<E extends keyof Events>(event: E): Promise<Arguments<Events[E]>> {
+  public async waitFor<E extends keyof Events>(event: E): Promise<Arguments<Events[E]>> {
     // FIX this will not be cleaned up if offAll is used
     // For now the event will be hanging forever!
     // See skipped test
@@ -86,6 +86,11 @@ export class WebEventEmitter<Events extends BaseEventMap> {
       this.on(event, sub as any);
     });
   }
+
+  // TODO make as event iterator
+  // public async asIterator<E extends keyof Events>(event: E): Promise<Arguments<Events[E]>> {
+
+  // }
 
   /**
    * Unsubscribes from event

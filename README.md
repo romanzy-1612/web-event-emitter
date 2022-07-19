@@ -25,6 +25,8 @@ Extend your class from `WebEventEmitter`. Now all events are typed.
 export class MyClass extends WebEventEmitter<MyEventMap> {}
 ```
 
+Additionally provides `waitFor` method. It works the same way as `once`, but returns a promise instead
+
 ## API
 
 ```typescript
@@ -56,7 +58,7 @@ export class MyClass extends WebEventEmitter<MyEventMap> {}
    * @param event Event name
    * @returns In async context returns event data as an array
    */
-  public async wait<E extends keyof Events>(event: E): Promise<Arguments<Events[E]>>
+  public async waitFor<E extends keyof Events>(event: E): Promise<Arguments<Events[E]>>
 
   /**
    * Unsubscribes from event
@@ -73,6 +75,10 @@ export class MyClass extends WebEventEmitter<MyEventMap> {}
    */
   public offAll<E extends keyof Events>(event?: E): this
 ```
+
+# TODO
+
+- [ ] add "asIterator" method. useful to be used as
 
 # Credits
 
