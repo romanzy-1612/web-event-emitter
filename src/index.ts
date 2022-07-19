@@ -73,14 +73,22 @@ export class WebEventEmitter<Events extends BaseEventMap> {
    * @param listener Callback function to execute when event is emitted
    * @returns
    */
-  // public async wait<E extends keyof Events>(event: E): Promise<Events[E]> {
-  //   // FIX this will not be cleaned up if offAll is used
+  public async wait<E extends keyof Events>(event: E): Promise<Events[E]> {
+    // FIX this will not be cleaned up if offAll is used
+    // For now the event in hanging forever
 
-  //   return new Promise((resolve, _reject) => {
-  //     this.once(event, (result) => resolve(result as any));
-  //     // resolve();
-  //   });
-  // }
+    return new Promise((resolve, _reject) => {
+      const sub = (...args) => {
+        this.off(event, sub as any);
+
+        // eslint-disable-next-line prefer-rest-params
+        // listener.apply(this, args);
+        resolve(args as any);
+      };
+
+      this.on(event, sub as any);
+    });
+  }
 
   /**
    * Unsubscribes from event

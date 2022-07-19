@@ -65,6 +65,15 @@ describe('Emitter events', () => {
 
     spyFunc.mockClear();
   });
+
+  test('emitter can wait', () => {
+    expect.assertions(1);
+
+    emitter.wait('eventName').then((res) => {
+      expect(res).toEqual([]);
+    });
+    emitter.emit('eventName');
+  });
 });
 
 describe('Emitter callback data', () => {
@@ -79,7 +88,7 @@ describe('Emitter callback data', () => {
     };
   });
 
-  test('in on', () => {
+  test('is correct in on', () => {
     emitter.on('eventName', cb);
     emitter.emit('eventName', 'arg1', 'arg2');
     expect(spyFunc).toBeCalledWith(['arg1', 'arg2']);
@@ -87,7 +96,7 @@ describe('Emitter callback data', () => {
     // spyFunc.mockClear();
   });
 
-  test('in once', () => {
+  test('is correct in once', () => {
     emitter.once('eventName', cb);
     emitter.emit('eventName', 'arg1', 'arg2');
     emitter.emit('eventName', 'arg1', 'arg2');
@@ -95,6 +104,18 @@ describe('Emitter callback data', () => {
     expect(spyFunc).toBeCalledWith(['arg1', 'arg2']);
 
     // spyFunc.mockClear();
+  });
+
+  test('is correct in wait', async () => {
+    expect.assertions(2);
+
+    emitter.wait('eventName').then((val) => {
+      // console.log('return val', val);
+      expect(val).toEqual(['arg1', 'arg2']);
+    });
+
+    const res = emitter.emit('eventName', 'arg1', 'arg2');
+    expect(res).toBe(true);
   });
 });
 
